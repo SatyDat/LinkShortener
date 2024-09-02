@@ -3,12 +3,19 @@ const app = express();
 
 app.use(express.json());
 
-let shortenedUrls = [];
 
+const crypto = require('crypto');
+
+function generateHash(url) {
+    const hash = crypto.createHash('sha256');
+    hash.update(url);
+    return hash.update(url).digest('hex').substring(0, 6);
+}
+
+module.exports = generateHash;
 app.post('/', (req, res) => {
     const url = req.body.url;
-    shortenedUrls.push(url);
-    const key = "wsf5f"; // just a placeholder, you can generate a real key here
+    const key = generateHash(url);
     const shortUrl = `http://localhost/${key}`;
     res.send(JSON.stringify({
         key,
