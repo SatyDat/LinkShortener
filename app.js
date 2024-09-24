@@ -1,27 +1,23 @@
 const express = require('express');
+const run = require('./database'); // Adjust path to where your `run` function is located
+const generateHash = require('./hash');
+
 const app = express();
 
 app.use(express.json());
 
+// Run the MongoDB connection logic
+run().catch(console.dir); // Catch any errors in MongoDB connection
 
-const crypto = require('crypto');
-
-function generateHash(url) {
-    const hash = crypto.createHash('sha256');
-    hash.update(url);
-    return hash.update(url).digest('hex').substring(0, 6);
-}
-
-module.exports = generateHash;
 app.post('/', (req, res) => {
     const url = req.body.url;
     const key = generateHash(url);
     const shortUrl = `http://localhost/${key}`;
-    res.send(JSON.stringify({
+    res.json({
         key,
         long_url: url,
         short_url: shortUrl
-    }, null, 4));
+    });
 });
 
 const port = 8080;
